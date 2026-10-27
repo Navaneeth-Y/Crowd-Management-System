@@ -1,0 +1,27 @@
+<div class="login-page">
+  <div class="login-art">
+    <div class="art-brand"><span class="brand-mark">C</span> CrowdPulse</div>
+    <div class="art-copy"><span class="kicker">SEE THE BIGGER PICTURE</span><h1>Understand every<br>movement in your space.</h1><p>Real-time crowd intelligence and operational insights, all in one place.</p></div>
+    <div class="art-stats"><div><strong>LIVE</strong><span>Occupancy insights</span></div><div><strong>360°</strong><span>Site visibility</span></div><div><strong>UTC</strong><span>Time-aligned data</span></div></div>
+    <div class="art-orb orb-one"></div><div class="art-orb orb-two"></div>
+  </div>
+  <div class="login-panel">
+    <div class="mobile-brand"><span class="brand-mark">C</span> CrowdPulse</div>
+    <div class="login-card">
+      <div class="login-icon">↗</div><span class="kicker">WELCOME BACK</span>
+      <h2>Sign in to your workspace</h2><p class="muted">Enter your credentials to access crowd analytics.</p>
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <label for="email">Email address</label>
+        <input id="email" type="email" formControlName="email" placeholder="you@company.com" autocomplete="username">
+        @if (form.controls.email.touched && form.controls.email.invalid) { <small class="field-error">Enter a valid email address.</small> }
+        <label for="password">Password</label>
+        <input id="password" type="password" formControlName="password" placeholder="Enter your password" autocomplete="current-password">
+        @if (form.controls.password.touched && form.controls.password.invalid) { <small class="field-error">Password is required.</small> }
+        @if (errorMessage) { <div class="form-error" role="alert">{{ errorMessage }}</div> }
+        <button type="submit" [disabled]="loading">{{ loading ? 'Signing in…' : 'Sign in' }} <span>→</span></button>
+      </form>
+      <div class="secure-note"><span>▣</span> Secure access · JWT authenticated</div>
+    </div>
+    <footer>© 2026 CrowdPulse · Crowd intelligence platform</footer>
+  </div>
+</div>

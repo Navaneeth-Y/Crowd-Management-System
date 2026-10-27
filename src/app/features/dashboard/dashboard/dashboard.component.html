@@ -1,0 +1,82 @@
+<div class="page-intro"><div><h2>Live crowd overview</h2><p>Monitor footfall, occupancy and visitor behaviour across your sites.</p></div><span class="updated"><i></i> API-powered analytics</span></div>
+
+<section class="filter-panel">
+  <div class="filter-title"><span class="filter-icon">⌘</span><div><strong>Analytics filters</strong><small>Choose a site and time window</small></div></div>
+  <div class="filters">
+   
+<label>
+  Site
+  <select
+    [(ngModel)]="selectedSiteId"
+    (ngModelChange)="onSiteChange()"
+    [disabled]="siteLoading"
+  >
+    <option value="" disabled>Select a site</option>
+    @for (site of sites; track site.siteId) {
+      <option [value]="site.siteId">{{ site.name }}</option>
+    }
+  </select>
+</label>
+
+    <label>From<input type="datetime-local" [(ngModel)]="fromDate"></label>
+    <label>To<input type="datetime-local" [(ngModel)]="toDate"></label>
+    <button class="primary-btn" (click)="loadAnalytics()" [disabled]="loading || !selectedSiteId">{{ loading ? 'Loading…' : 'Apply filters' }} <span>→</span></button>
+  </div>
+  @if (selectedSite) { <div class="site-meta"><span>⌖ {{ selectedSite.city }}, {{ selectedSite.country }}</span><span>Timezone: {{ selectedSite.timezone }}</span><span>{{ selectedSite.zones.length }} zones</span></div> }
+</section>
+
+@if (siteLoading || loading) { <app-loading-spinner [label]="siteLoading ? 'Loading available sites…' : 'Fetching analytics from the API…'" /> }
+@if (errorMessage) { <app-error-message [message]="errorMessage" /> }
+
+<div class="section-heading"><div><h3>Performance snapshot</h3><p>Values are returned by the analytics API for the selected period.</p></div></div>
+<div class="metric-grid">
+  <article class="metric-card"><div class="metric-top"><span class="metric-icon purple">↗</span><span class="metric-label">Total footfall</span></div><strong>{{ footfall?.footfall ?? '—' }}</strong><small>Entry events · not unique visitors</small><div class="metric-bottom"><span class="mini-bars"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="muted">Selected period</span></div></article>
+  <article class="metric-card"><div class="metric-top"><span class="metric-icon blue">◷</span><span class="metric-label">Average dwell time</span></div><strong>{{ dwell ? (dwell.avgDwellMinutes | number:'1.0-1') : '—' }}<em *ngIf="dwell"> min</em></strong><small>{{ dwell?.dwellRecords ?? '—' }} dwell records</small><div class="metric-bottom"><span class="pill-neutral">API metric</span><span class="muted">Selected period</span></div></article>
+  <article class="metric-card"><div class="metric-top"><span class="metric-icon green">◉</span><span class="metric-label">Latest occupancy bucket</span></div><strong>{{ occupancy?.buckets?.length ? (occupancy!.buckets[occupancy!.buckets.length - 1].avg | number:'1.0-0') : '—' }}</strong><small>Average people present per hour</small><div class="metric-bottom"><span class="pill-neutral">{{ occupancy?.timezone || 'Timezone pending' }}</span></div></article>
+  <article class="metric-card"><div class="metric-top"><span class="metric-icon orange">♙</span><span class="metric-label">Live occupancy event</span></div><strong>
+  {{ liveOccupancy?.zoneOccupancy ?? liveOccupancy?.siteOccupancy ?? '—' }}
+</strong>
+<small>
+  Zone: {{ liveZoneName }}
+  · Site: {{ selectedSite?.name || 'Unknown site' }}
+</small>
+<div class="metric-bottom"><span class="live-indicator"><i></i> Live feed</span></div></article>
+</div>
+
+<div class="charts-grid">
+  <section class="panel chart-panel">
+    <div class="panel-heading"><div><h3>Hourly occupancy</h3><p>Average people present per hour</p></div><span class="chart-legend"><i class="legend-purple"></i> Occupancy</span></div>
+    @if (occupancy?.buckets?.length) {
+      <div class="bar-chart">
+        @for (bucket of occupancy!.buckets; track bucket.utc) {
+          <div class="bar-column"><span class="bar-value">{{ bucket.avg | number:'1.0-0' }}</span><div class="bar-track"><div class="bar-fill" [style.height.%]="barHeight(bucket.avg, occupancyValues)"></div></div><span class="bar-label">{{ bucket.local }}</span></div>
+        }
+      </div>
+    } @else { <div class="empty-chart">Occupancy buckets will appear here when the API returns data.</div> }
+  </section>
+  <section class="panel chart-panel">
+    <div class="panel-heading"><div><h3>Visitor demographics</h3><p>Hourly gender counts from entry/exit events</p></div><span class="chart-legend"><i class="legend-blue"></i> Male <i class="legend-pink"></i> Female</span></div>
+    @if (demographics?.buckets?.length) {
+      <div class="demographics-list">
+        @for (bucket of demographics!.buckets; track bucket.utc) {
+          <div class="demo-row"><div class="demo-time">{{ bucket.local }}</div><div class="demo-bars"><div class="demo-bar male" [style.width.%]="barHeight(bucket.male, demographicsMaxValues)"><span>{{ bucket.male }}</span></div><div class="demo-bar female" [style.width.%]="barHeight(bucket.female, demographicsMaxValues)"><span>{{ bucket.female }}</span></div></div></div>
+        }
+      </div>
+    } @else { <div class="empty-chart">Demographic buckets will appear here when the API returns data.</div> }
+  </section>
+</div>
+
+<div class="bottom-grid">
+  <section class="panel live-panel"><div class="panel-heading"><div><h3>Live alerts</h3><p>Recent events from the real-time feed</p></div><span class="live-indicator"><i></i> Listening</span></div>
+    @if (alerts.length) { @for (alert of alerts; track $index) { <div class="alert-row"><span class="alert-mark">!</span><div><strong>
+  {{ alert.personName || 'Unknown visitor' }}
+  — {{ alert.direction || alert.action || 'Crowd activity' }}
+</strong>
+<small>
+  {{ alert.zoneName || alert.zoneId || 'Zone unavailable' }}
+  · {{ alert.siteId || alert.site || 'Site unavailable' }}
+</small></div><span class="severity" [class.high]="alert.severity?.toLowerCase() === 'high'">{{ alert.severity || 'Info' }}</span></div> } }
+    @else { <div class="empty-state"><span>◌</span><strong>No alerts received yet</strong><p>Real-time events will appear once the backend connection is configured.</p></div> }
+  </section>
+  <section class="panel quick-panel"><div class="panel-heading"><div><h3>Data notes</h3><p>Interpretation of the current metrics</p></div></div><div class="note-row"><span class="note-icon">↗</span><div><strong>Footfall counts entries</strong><p>It represents entry events, not distinct people.</p></div></div><div class="note-row"><span class="note-icon">◷</span><div><strong>Time values use UTC</strong><p>Date filters are sent as epoch milliseconds.</p></div></div><div class="note-row"><span class="note-icon">▤</span><div><strong>Analytics are read-only</strong><p>Charts are based on server-returned buckets.</p></div></div></section>
+</div>

@@ -1,0 +1,29 @@
+<div class="page-intro"><div><h2>Entry & exit logs</h2><p>Review visitor movement and dwell duration for a selected site and time range.</p></div><span class="record-count">{{ result?.totalRecords ?? 0 }} total records</span></div>
+
+<section class="filter-panel">
+  <div class="filters">
+    <label>Site<select [(ngModel)]="selectedSiteId"><option value="" disabled>Select a site</option>@for (site of sites; track site.siteId) { <option [value]="site.siteId">{{ site.name }}</option> }</select></label>
+    <label>From<input type="datetime-local" [(ngModel)]="fromDate"></label>
+    <label>To<input type="datetime-local" [(ngModel)]="toDate"></label>
+    <button class="primary-btn" (click)="pageNumber = 1; load()" [disabled]="loading">Apply filters →</button>
+  </div>
+</section>
+
+@if (errorMessage) { <app-error-message [message]="errorMessage" /> }
+@if (loading) { <app-loading-spinner label="Loading entry/exit records…" /> }
+
+<section class="table-panel">
+  <div class="table-toolbar"><div><h3>Visitor movement</h3><p>Server-paginated entry and exit history</p></div><input class="search" type="search" [(ngModel)]="searchTerm" placeholder="Search visitor name…"></div>
+  <div class="table-scroll"><table>
+    <thead><tr><th>VISITOR</th><th>ZONE</th><th>ENTRY TIME</th><th>EXIT TIME</th><th>DWELL TIME</th><th>SEVERITY</th></tr></thead>
+    <tbody>
+      @for (record of filteredRecords; track record.personId + record.entryUtc) {
+        <tr><td><div class="person"><span class="person-avatar">{{ record.personName.charAt(0).toUpperCase() || '?' }}</span><div><strong>{{ record.personName }}</strong><small>{{ record.personId }}</small></div></div></td><td>{{ record.zoneName || '—' }}</td><td>{{ record.entryLocal || (record.entryUtc | date:'medium') }}</td><td>{{ record.exitLocal || (record.exitUtc ? (record.exitUtc | date:'medium') : '—') }}</td><td><strong>{{ record.dwellMinutes | number:'1.0-1' }}</strong> min</td><td><span class="severity" [ngClass]="severityClass(record.severity)">{{ record.severity || 'Normal' }}</span></td></tr>
+      } @empty {
+        <tr><td colspan="6"><div class="empty-table"><span>☷</span><strong>No entry/exit records</strong><p>Try another site or a wider date range.</p></div></td></tr>
+      }
+    </tbody>
+  </table></div>
+  <div class="table-footer"><span>Page {{ result?.pageNumber ?? pageNumber }} of {{ result?.totalPages ?? 1 }} · {{ result?.totalRecords ?? 0 }} records</span><div class="pagination"><button (click)="changePage(pageNumber - 1)" [disabled]="pageNumber <= 1 || loading">← Previous</button><button (click)="changePage(pageNumber + 1)" [disabled]="!result || pageNumber >= result.totalPages || loading">Next →</button></div></div>
+  <p class="schema-note">The documented entry/exit response does not include gender. This table displays only fields confirmed by the API contract.</p>
+</section>

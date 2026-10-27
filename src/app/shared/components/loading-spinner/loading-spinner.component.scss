@@ -1,0 +1,3 @@
+.loading { display:flex; align-items:center; gap:.65rem; color:#667085; padding:1.5rem 0; }
+.spinner { width:18px; height:18px; border:2px solid #d0d5dd; border-top-color:#635bff; border-radius:50%; animation:spin .8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }

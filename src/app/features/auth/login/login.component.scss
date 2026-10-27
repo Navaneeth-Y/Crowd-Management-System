@@ -1,0 +1,35 @@
+:host { display:block; min-height:100vh; }
+.login-page { min-height:100vh; display:grid; grid-template-columns:1fr 1fr; background:#fff; }
+.login-art { position:relative; overflow:hidden; display:flex; flex-direction:column; padding:40px 7%; color:#fff; background:radial-gradient(ellipse at 75% 80%,#423c91 0,transparent 38%),linear-gradient(145deg,#11152e,#1f2450 62%,#29235f); }
+.art-brand,.mobile-brand { display:flex; align-items:center; gap:11px; font-weight:800; font-size:19px; position:relative; z-index:1; }
+.brand-mark { display:grid; place-items:center; width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#a69aff,#635bff);color:#fff; }
+.art-copy { position:relative; z-index:1; margin:auto 0; padding:60px 0; }
+.kicker { color:#8b82ff; font-size:10px; font-weight:800; letter-spacing:1.7px; }
+.art-copy .kicker { color:#b7b0ff; }
+.art-copy h1 { color:#fff; font-size:clamp(32px,4vw,51px); line-height:1.13; letter-spacing:-2px; margin:18px 0; }
+.art-copy p { max-width:390px; color:#c5c8e5; line-height:1.8; font-size:14px; }
+.art-stats { display:flex; gap:40px; position:relative; z-index:1; padding-bottom:20px; }
+.art-stats strong,.art-stats span { display:block; }
+.art-stats strong { font-size:18px; }
+.art-stats span { color:#aeb3d3; font-size:10px; margin-top:6px; }
+.art-orb { position:absolute; border:1px solid #aaa5ff26; border-radius:50%; }
+.orb-one { width:450px;height:450px;right:-180px;top:18%;box-shadow:0 0 0 50px #aaa5ff08,0 0 0 100px #aaa5ff06; }
+.orb-two { width:270px;height:270px;right:-90px;top:30%; }
+.login-panel { display:flex; flex-direction:column; justify-content:center; align-items:center; padding:40px; }
+.login-card { width:min(100%,390px); }
+.login-icon { width:44px;height:44px;display:grid;place-items:center;background:#f1efff;color:#635bff;border-radius:13px;font-size:23px;margin-bottom:30px; }
+.login-card h2 { font-size:26px; letter-spacing:-.8px; color:#101828; margin:9px 0; }
+.muted { color:#667085; font-size:13px; line-height:1.7; margin:0 0 28px; }
+form label { display:block; font-size:12px;font-weight:700;color:#344054;margin:17px 0 7px; }
+form input { box-sizing:border-box; width:100%; border:1px solid #d0d5dd; border-radius:9px; padding:13px 14px; font:inherit; font-size:13px; outline:none; }
+form input:focus { border-color:#8278ff; box-shadow:0 0 0 3px #635bff1c; }
+form button { margin-top:25px; width:100%; border:0; border-radius:9px; padding:14px 16px; background:#635bff; color:#fff; font-weight:700; font-size:13px; cursor:pointer; box-shadow:0 4px 10px #635bff30; }
+form button span { float:right;font-size:17px;line-height:12px; }
+form button:disabled { opacity:.65;cursor:wait; }
+.field-error { display:block;color:#b42318;margin-top:5px;font-size:11px; }
+.form-error { margin-top:15px; color:#b42318;background:#fef3f2;padding:11px;border-radius:8px;font-size:12px; }
+.secure-note { text-align:center;color:#98a2b3;font-size:10px;margin-top:25px; }
+.secure-note span { margin-right:5px; }
+.login-panel footer { margin-top:60px;color:#98a2b3;font-size:10px;text-align:center; }
+.mobile-brand { display:none; }
+@media(max-width:800px) { .login-page { grid-template-columns:1fr; } .login-art { display:none; } .login-panel { min-height:100vh;padding:25px; } .mobile-brand { display:flex;align-self:flex-start;margin-bottom:60px;color:#101828; } .login-panel footer { margin-top:45px; } }
