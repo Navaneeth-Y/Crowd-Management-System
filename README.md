@@ -1,93 +1,166 @@
-# CrowdPulse — Crowd Management UI
+# CrowdPulse — Crowd Management System
 
-Angular 17 standalone SPA scaffold for the Kloudspot Crowd Management assessment.
+An Angular 17 standalone Single Page Application (SPA) built for the Kloudspot Crowd Management assessment. The dashboard brings together crowd analytics, occupancy monitoring, visitor entry/exit records, and real-time alert interfaces.
 
-## Included
+## Live Demo
 
-- Login page connected to `POST /api/auth/login`.
-- JWT stored in `sessionStorage`, protected routes, and an HTTP interceptor that sends `Authorization: Bearer <token>`.
-- Site selector backed by `GET /api/sites`.
-- Dashboard calls for footfall, dwell, occupancy, and demographics.
-- Entry/exit log table with server-side pagination and client-side search on the currently loaded page.
-- Responsive UI with separate TypeScript, HTML, and SCSS files.
-- Socket.IO service scaffold listening for `live_occupancy` and `alert`.
+- **Live Application:** https://kscrowdmanagement.netlify.app/
+- **GitHub Repository:** https://github.com/Navaneeth-Y/Crowd-Management-System
 
-## Requirements
+## Features
 
-- Node.js version compatible with Angular CLI 17 (Node.js 18.13+ or 20.9+ recommended).
-- npm.
+- **Authentication:** Login integrated with `POST /api/auth/login`, JWT-based authentication, protected routes, and an HTTP interceptor.
+- **Site Selection:** Site selector backed by `GET /api/sites`.
+- **Crowd Analytics:** Dashboard integration for footfall, dwell time, occupancy, and demographics.
+- **Entry/Exit Records:** Visitor records with server-side pagination and client-side search on the currently loaded page.
+- **Live Monitoring:** Socket.IO service for `live_occupancy` and `alert` events.
+- **Responsive UI:** Layout designed for desktop and smaller screens.
+- **Maintainable Architecture:** Separate TypeScript, HTML, and SCSS files for components, with dedicated services, models, guards, and interceptors.
 
-## Run locally
+## Technology Stack
+
+- Angular 17
+- TypeScript
+- HTML5 and SCSS
+- RxJS and Angular HttpClient
+- Socket.IO client
+- JWT authentication
+- REST APIs
+- Netlify deployment
+- Git and GitHub
+
+## Prerequisites
+
+- Node.js version compatible with Angular CLI 17. Node.js 18.13+ or 20.9+ is recommended.
+- npm
+
+## Run Locally
+
+Clone the repository:
+
+```bash
+git clone https://github.com/Navaneeth-Y/Crowd-Management-System.git
+cd Crowd-Management-System
+```
+
+Install dependencies:
 
 ```bash
 npm install
+```
+
+Start the development server:
+
+```bash
 npm start
 ```
 
-Open `http://localhost:4200`.
+If the project does not define an `npm start` script, use:
 
-## API configuration
-
-The API base URL is configured in `src/environments/environment.ts`:
-
-```ts
-apiBaseUrl: 'https://hiring-dev.internal.kloudspot.com'
+```bash
+npx ng serve
 ```
 
-The app assumes the API response contracts supplied in the assessment Swagger notes. A valid JWT is required for protected endpoints.
+Open http://localhost:4200 in your browser.
 
-### Date filters
+## API Configuration
 
-The date controls are interpreted in the browser's local timezone and converted to epoch milliseconds with `Date.getTime()` for `fromUtc` and `toUtc`. The API stores its timestamps in UTC. The site timezone returned by the backend is displayed as metadata; if the assessment requires date selection in each site's local timezone, implement that explicitly after confirming the expected UX.
+The API base URL is configured in:
 
-### Real-time events — needs backend confirmation
+`src/environments/environment.ts`
 
-`src/app/core/services/socket.service.ts` is scaffolded for event names `live_occupancy` and `alert`, based on the example supplied in the assessment material. The actual Socket.IO URL, handshake authentication format, event payload schemas, and any room/subscription messages have not been confirmed. Therefore `socketUrl` is deliberately blank in `environment.ts`; real-time connection will remain disabled until the backend contract is known.
+The assessment API base URL is:
 
-The backend docs mention SSE too, but no SSE endpoint or event schema has been provided. This project does not invent an SSE URL or use SSE without that contract.
+`https://hiring-dev.internal.kloudspot.com`
 
-## Known API contract gaps
+The application uses the authentication and analytics endpoints defined by the assessment API. Protected endpoints require a valid JWT.
 
-- The entry/exit record schema provided for `/api/analytics/entry-exit` does not contain a gender field, although the assessment brief mentions gender in the visitor table. The UI does not fabricate that field.
-- Invalid-login error response shape was not provided. The login page handles common `errorMessage` / `message` shapes and shows a generic fallback.
-- No API contract was provided for percentage comparisons / change indicators. The dashboard avoids inventing comparison values.
-- Simulation start/stop endpoints are not exposed as buttons because it has not been confirmed that the frontend should control the simulator.
-- The documented footfall metric counts entry events, not unique visitors.
+### Analytics Endpoints
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /api/auth/login` | Authenticate a user |
+| `GET /api/sites` | Retrieve available sites |
+| `/api/analytics/footfall` | Retrieve entry-event counts |
+| `/api/analytics/dwell` | Retrieve dwell-time metrics |
+| `/api/analytics/occupancy` | Retrieve occupancy data |
+| `/api/analytics/demographics` | Retrieve demographic data |
+
+Analytics requests use `siteId`, `fromUtc`, and `toUtc`, with date ranges represented as epoch milliseconds.
+
+### Date Filters
+
+The date controls are interpreted in the browser's local timezone and converted to epoch milliseconds using `Date.getTime()`. The API stores timestamps in UTC. The site's timezone is displayed as metadata; site-specific local-time date selection may require additional implementation if required by the assessment.
+
+### Real-Time Events
+
+The Socket.IO service is intended to handle the `live_occupancy` and `alert` events.
+
+The exact connection URL, authentication handshake, payload schemas, and room/subscription requirements should match the backend's actual contract. The backend documentation also mentions Server-Sent Events (SSE); no alternative SSE endpoint should be assumed without confirmation.
+
+## Known API Contract Limitations
+
+- The supplied entry/exit schema does not define a gender field, although the assessment brief mentions gender in the visitor table. The UI does not fabricate missing values.
+- The exact invalid-login error response is not fully specified. The login page handles common `errorMessage` and `message` fields and provides a generic fallback.
+- The API contract does not define percentage comparisons or change indicators, so the dashboard avoids inventing comparison values.
+- Simulator start/stop controls are not exposed unless their intended frontend behavior is confirmed.
+- Footfall represents entry events, not unique visitors.
+
+## Project Structure
+
+The application follows a feature-based Angular structure. UI components maintain separate TypeScript, HTML, and SCSS files.
+
+```text
+src/
+├── app/
+│   ├── core/
+│   │   ├── guards/
+│   │   ├── interceptors/
+│   │   └── services/
+│   ├── features/
+│   │   ├── auth/
+│   │   ├── dashboard/
+│   │   │   └── components/
+│   │   └── entries/
+│   ├── layout/
+│   └── shared/
+│       └── components/
+├── assets/
+├── environments/
+├── _redirects
+├── index.html
+├── main.ts
+└── styles.scss
+```
+
+- `core/guards/` — route protection
+- `core/interceptors/` — authentication headers for HTTP requests
+- `core/services/` — authentication and Socket.IO services
+- `features/auth/` — login UI and authentication models
+- `features/dashboard/` — dashboard, analytics, and supporting components
+- `features/entries/` — entry/exit records and related API integration
+- `layout/` — application layout components
+- `shared/components/` — reusable loading and error components
+- `environments/` — API and environment configuration
 
 ## Build
+
+Create a production build:
 
 ```bash
 npm run build
 ```
 
-## Before submission
+The production build was verified locally. The Netlify deployment also includes a redirect rule so Angular client-side routes continue to work when refreshed directly.
 
-1. Confirm the real-time Socket.IO URL, auth handshake, event payloads, and whether SSE must be used.
-2. Confirm how the backend expects site-local date ranges to be selected, if relevant.
-3. Confirm whether entry/exit gender exists in actual API responses or a separate endpoint.
-4. Run `npm install`, `npm run build`, and test against the assessment API with the provided test account.
-5. Never commit JWTs or passwords. Use only assessment credentials locally.
-6. Replace this README's setup details if deployment hosting needs extra configuration.
+## Security
 
+- Never commit passwords, JWTs, access tokens, or other secrets.
+- Use assessment credentials only for authorized testing.
+- Keep authentication and API error handling appropriate for the deployed environment.
 
-## Project organization
+## Assessment Deliverables
 
-This project uses a conventional feature-based Angular structure. Each UI component has its own
-`.component.ts`, `.component.html`, and `.component.scss` files. Layout pieces (header, sidebar,
-footer, main layout), shared UI components, route guards, interceptors, models, and API services
-are kept in their own folders.
+- **Source Code:** https://github.com/Navaneeth-Y/Crowd-Management-System
+- **Live Demo:** https://kscrowdmanagement.netlify.app/
 
-- `src/app/layout/`: main layout, header, sidebar, footer
-- `src/app/core/guards/`: route guards
-- `src/app/core/interceptors/`: HTTP interceptors
-- `src/app/core/services/`: authentication and socket service
-- `src/app/shared/components/`: reusable loading and error components
-- `src/app/features/dashboard/`: dashboard, analytics models and analytics service
-- `src/app/features/dashboard/components/`: occupancy chart, demographics chart and live alerts UI
-- `src/app/features/entries/`: entry/exit page, models and API service
-- `src/app/features/auth/`: login page and authentication models
-
-Note: the live event URL remains intentionally unconfigured because a real Socket.IO/SSE endpoint
-and its authentication contract were not supplied. Analytics endpoints are historical/read-only.
-The project has not been verified with `npm install` or `ng build` in this environment; run those
-commands locally and resolve any environment-specific compiler errors before submission.
